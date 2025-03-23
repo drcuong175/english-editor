@@ -48,10 +48,19 @@ const LessonPreview = () => {
   };
 
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{ padding: '24px' }}>
       {!lesson ? (
-        <div style={{ textAlign: 'center' }}>
-          <h2>👶 Chọn bài học</h2>
+        <div style={{ 
+          textAlign: 'center',
+          padding: '48px 0'
+        }}>
+          <h2 style={{
+            fontSize: '2rem',
+            color: '#2A7B90',
+            marginBottom: '32px'
+          }}>
+            👶 Chọn Bài Học
+          </h2>
           <input
             type="file"
             accept=".json"
@@ -62,28 +71,40 @@ const LessonPreview = () => {
           <button
             onClick={() => fileInputRef.current.click()}
             style={{
-              padding: '12px 24px',
-              fontSize: 18,
-              backgroundColor: '#2196F3',
-              color: 'white',
+              padding: '20px 40px',
+              fontSize: '1.5rem',
+              backgroundColor: '#97DECE',
+              color: '#444',
               border: 'none',
-              borderRadius: 8,
-              cursor: 'pointer'
+              borderRadius: '20px',
+              cursor: 'pointer',
+              boxShadow: '0 6px 12px rgba(0,0,0,0.1)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              margin: '0 auto'
             }}
           >
-            📂 Tải lên bài học
+            📂 Tải Lên Bài Học
           </button>
         </div>
       ) : (
         <div>
-          <h2 style={{ textAlign: 'center' }}>{lesson.name}</h2>
+          <h2 style={{ 
+            textAlign: 'center',
+            fontSize: '2rem',
+            color: '#2A7B90',
+            marginBottom: '32px'
+          }}>
+            {lesson.name}
+          </h2>
           <div style={{ 
-            maxWidth: 600, 
-            margin: '0 auto', 
-            padding: 24,
-            backgroundColor: '#f5f5f5',
-            borderRadius: 16,
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: '32px',
+            backgroundColor: '#FFF5BA',
+            borderRadius: '30px',
+            boxShadow: '0 10px 20px rgba(0,0,0,0.1)'
           }}>
             {lesson.entries[currentIndex].image && (
               <img
