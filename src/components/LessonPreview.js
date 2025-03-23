@@ -1,31 +1,36 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { saveLesson, loadLesson, clearLesson } from '../utils/db';
 
 const LessonPreview = () => {
   const [lesson, setLesson] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const fileInputRef = useRef();
 
-  // Tự động load bài học từ localStorage khi component mount
+  // Load dữ liệu khi component mount
   useEffect(() => {
-    const savedLesson = localStorage.getItem('lastLesson');
-    const savedIndex = localStorage.getItem('lastIndex');
-    
-    if (savedLesson) {
+    const loadSavedLesson = async () => {
       try {
-        const lessonData = JSON.parse(savedLesson);
-        setLesson(lessonData);
-        setCurrentIndex(savedIndex ? parseInt(savedIndex) : 0);
+        setIsLoading(true);
+        const { lesson: savedLesson, currentIndex: savedIndex } = await loadLesson();
+        if (savedLesson) {
+          setLesson(savedLesson);
+          setCurrentIndex(savedIndex);
+        }
       } catch (error) {
         console.error('Lỗi khi tải bài học:', error);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    loadSavedLesson();
   }, []);
 
-  // Lưu bài học và index hiện tại vào localStorage mỗi khi thay đổi
+  // Lưu dữ liệu khi có thay đổi
   useEffect(() => {
     if (lesson) {
-      localStorage.setItem('lastLesson', JSON.stringify(lesson));
-      localStorage.setItem('lastIndex', currentIndex.toString());
+      saveLesson(lesson, currentIndex);
     }
   }, [lesson, currentIndex]);
 
@@ -33,14 +38,12 @@ const LessonPreview = () => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
           const lessonData = JSON.parse(e.target.result);
           setLesson(lessonData);
           setCurrentIndex(0);
-          // Lưu bài học mới vào localStorage
-          localStorage.setItem('lastLesson', JSON.stringify(lessonData));
-          localStorage.setItem('lastIndex', '0');
+          await saveLesson(lessonData, 0);
         } catch (error) {
           alert('File không hợp lệ!');
         }
@@ -49,12 +52,14 @@ const LessonPreview = () => {
     }
   };
 
-  // Thêm hàm xóa bài học
-  const clearLesson = () => {
-    setLesson(null);
-    setCurrentIndex(0);
-    localStorage.removeItem('lastLesson');
-    localStorage.removeItem('lastIndex');
+  const handleClearLesson = async () => {
+    try {
+      await clearLesson();
+      setLesson(null);
+      setCurrentIndex(0);
+    } catch (error) {
+      console.error('Lỗi khi xóa bài học:', error);
+    }
   };
 
   const speakText = (text) => {
@@ -81,6 +86,19 @@ const LessonPreview = () => {
       setCurrentIndex(currentIndex - 1);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div style={{ 
+        textAlign: 'center', 
+        padding: '48px 0',
+        fontSize: '1.5rem',
+        color: '#2A7B90'
+      }}>
+        🎵 Đang tải bài học...
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '24px' }}>
@@ -140,7 +158,7 @@ const LessonPreview = () => {
               {lesson.name}
             </h2>
             <button
-              onClick={clearLesson}
+              onClick={handleClearLesson}
               style={{
                 padding: '12px 24px',
                 fontSize: '1rem',
