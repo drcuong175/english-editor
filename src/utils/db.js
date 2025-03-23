@@ -23,17 +23,25 @@ const openDB = () => {
   });
 };
 
+// Hàm kiểm tra localStorage có khả dụng không
+const isLocalStorageAvailable = () => {
+  try {
+    const test = '__test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 export const saveLesson = async (lesson, currentIndex) => {
   try {
-    const db = await openDB();
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    const store = tx.objectStore(STORE_NAME);
-
-    await Promise.all([
-      store.put(lesson, 'currentLesson'),
-      store.put(currentIndex, 'currentIndex')
-    ]);
-
+    if (!isLocalStorageAvailable()) {
+      throw new Error('localStorage không khả dụng');
+    }
+    localStorage.setItem('currentLesson', JSON.stringify(lesson));
+    localStorage.setItem('currentIndex', currentIndex.toString());
     return true;
   } catch (error) {
     console.error('Lỗi khi lưu bài học:', error);
@@ -43,17 +51,13 @@ export const saveLesson = async (lesson, currentIndex) => {
 
 export const loadLesson = async () => {
   try {
-    const db = await openDB();
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const store = tx.objectStore(STORE_NAME);
-
-    const lesson = await store.get('currentLesson');
-    const currentIndex = await store.get('currentIndex');
-
-    return {
-      lesson: lesson || null,
-      currentIndex: currentIndex || 0
-    };
+    if (!isLocalStorageAvailable()) {
+      throw new Error('localStorage không khả dụng');
+    }
+    const lessonStr = localStorage.getItem('currentLesson');
+    const lesson = lessonStr ? JSON.parse(lessonStr) : null;
+    const currentIndex = parseInt(localStorage.getItem('currentIndex')) || 0;
+    return { lesson, currentIndex };
   } catch (error) {
     console.error('Lỗi khi tải bài học:', error);
     return { lesson: null, currentIndex: 0 };
@@ -62,15 +66,11 @@ export const loadLesson = async () => {
 
 export const clearLesson = async () => {
   try {
-    const db = await openDB();
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    const store = tx.objectStore(STORE_NAME);
-
-    await Promise.all([
-      store.delete('currentLesson'),
-      store.delete('currentIndex')
-    ]);
-
+    if (!isLocalStorageAvailable()) {
+      throw new Error('localStorage không khả dụng');
+    }
+    localStorage.removeItem('currentLesson');
+    localStorage.removeItem('currentIndex');
     return true;
   } catch (error) {
     console.error('Lỗi khi xóa bài học:', error);

@@ -205,12 +205,12 @@ const LessonPreview = () => {
               <button
                 onClick={() => speakText(lesson.entries[currentIndex].word)}
                 style={{
-                  padding: '8px 16px',
-                  fontSize: 18,
+                  padding: '12px 24px',
+                  fontSize: '1.2rem',
                   backgroundColor: '#4CAF50',
                   color: 'white',
                   border: 'none',
-                  borderRadius: 8,
+                  borderRadius: '15px',
                   cursor: 'pointer'
                 }}
               >
@@ -245,12 +245,12 @@ const LessonPreview = () => {
                 onClick={prevWord}
                 disabled={currentIndex === 0}
                 style={{
-                  padding: '8px 16px',
-                  fontSize: 16,
+                  padding: '12px 24px',
+                  fontSize: '1.2rem',
                   backgroundColor: currentIndex === 0 ? '#ddd' : '#2196F3',
                   color: currentIndex === 0 ? '#666' : 'white',
                   border: 'none',
-                  borderRadius: 8,
+                  borderRadius: '15px',
                   cursor: currentIndex === 0 ? 'not-allowed' : 'pointer'
                 }}
               >
@@ -260,12 +260,12 @@ const LessonPreview = () => {
                 onClick={nextWord}
                 disabled={currentIndex === lesson.entries.length - 1}
                 style={{
-                  padding: '8px 16px',
-                  fontSize: 16,
+                  padding: '12px 24px',
+                  fontSize: '1.2rem',
                   backgroundColor: currentIndex === lesson.entries.length - 1 ? '#ddd' : '#2196F3',
                   color: currentIndex === lesson.entries.length - 1 ? '#666' : 'white',
                   border: 'none',
-                  borderRadius: 8,
+                  borderRadius: '15px',
                   cursor: currentIndex === lesson.entries.length - 1 ? 'not-allowed' : 'pointer'
                 }}
               >
