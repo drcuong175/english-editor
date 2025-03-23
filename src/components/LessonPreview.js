@@ -1,9 +1,33 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 const LessonPreview = () => {
   const [lesson, setLesson] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const fileInputRef = useRef();
+
+  // Tự động load bài học từ localStorage khi component mount
+  useEffect(() => {
+    const savedLesson = localStorage.getItem('lastLesson');
+    const savedIndex = localStorage.getItem('lastIndex');
+    
+    if (savedLesson) {
+      try {
+        const lessonData = JSON.parse(savedLesson);
+        setLesson(lessonData);
+        setCurrentIndex(savedIndex ? parseInt(savedIndex) : 0);
+      } catch (error) {
+        console.error('Lỗi khi tải bài học:', error);
+      }
+    }
+  }, []);
+
+  // Lưu bài học và index hiện tại vào localStorage mỗi khi thay đổi
+  useEffect(() => {
+    if (lesson) {
+      localStorage.setItem('lastLesson', JSON.stringify(lesson));
+      localStorage.setItem('lastIndex', currentIndex.toString());
+    }
+  }, [lesson, currentIndex]);
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -14,12 +38,23 @@ const LessonPreview = () => {
           const lessonData = JSON.parse(e.target.result);
           setLesson(lessonData);
           setCurrentIndex(0);
+          // Lưu bài học mới vào localStorage
+          localStorage.setItem('lastLesson', JSON.stringify(lessonData));
+          localStorage.setItem('lastIndex', '0');
         } catch (error) {
           alert('File không hợp lệ!');
         }
       };
       reader.readAsText(file);
     }
+  };
+
+  // Thêm hàm xóa bài học
+  const clearLesson = () => {
+    setLesson(null);
+    setCurrentIndex(0);
+    localStorage.removeItem('lastLesson');
+    localStorage.removeItem('lastIndex');
   };
 
   const speakText = (text) => {
@@ -90,14 +125,38 @@ const LessonPreview = () => {
         </div>
       ) : (
         <div>
-          <h2 style={{ 
-            textAlign: 'center',
-            fontSize: '2rem',
-            color: '#2A7B90',
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
             marginBottom: '32px'
           }}>
-            {lesson.name}
-          </h2>
+            <h2 style={{ 
+              textAlign: 'center',
+              fontSize: '2rem',
+              color: '#2A7B90',
+              margin: 0
+            }}>
+              {lesson.name}
+            </h2>
+            <button
+              onClick={clearLesson}
+              style={{
+                padding: '12px 24px',
+                fontSize: '1rem',
+                backgroundColor: '#FFB5B5',
+                color: '#444',
+                border: 'none',
+                borderRadius: '15px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              🗑️ Xóa bài học
+            </button>
+          </div>
           <div style={{ 
             maxWidth: '800px',
             margin: '0 auto',
